@@ -114,6 +114,11 @@ def signup():
     user = auth.create_user(email=email, password=password)
 
     # TODO: Initialize profile in Firestore
+    db.collection("profiles").document(user.uid).set({
+        "email": email,
+        "role": "user"
+    })
+
     # TODO: Redirect to login on success
 
 
