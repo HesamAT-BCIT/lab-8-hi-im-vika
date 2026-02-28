@@ -10,6 +10,7 @@ import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
+WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY")
 
 # A dummy user for the login. 
 dummy_user = {
@@ -110,18 +111,17 @@ def signup():
     if password != confirm_password:
         return render_template("signup.html", error="Passwords do not match")
 
-    # TODO: Create user with Firebase Admin SDK
+    # Create user with Firebase Admin SDK
     user = auth.create_user(email=email, password=password)
 
-    # TODO: Initialize profile in Firestore
+    # Initialize profile in Firestore
     db.collection("profiles").document(user.uid).set({
         "email": email,
         "role": "user"
     })
 
-    # TODO: Redirect to login on success
+    # Redirect to login on success
     return redirect(url_for("login"))
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
