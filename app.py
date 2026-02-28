@@ -97,6 +97,23 @@ def home():
         return render_template("dashboard.html", username=current_user)
     return redirect(url_for("login"))
 
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "GET":
+        return render_template("signup.html")
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+    confirm_password = request.form.get("confirm_password")
+
+    # Validate passwords match
+    if password != confirm_password:
+        return render_template("signup.html", error="Passwords do not match")
+
+    # TODO: Create user with Firebase Admin SDK
+    # TODO: Initialize profile in Firestore
+    # TODO: Redirect to login on success
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
