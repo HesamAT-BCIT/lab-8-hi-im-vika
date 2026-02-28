@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Union
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, Response
 from flask.typing import ResponseReturnValue
 import firebase_admin
+import requests
 from firebase_admin import credentials, firestore, auth
 from firebase_admin.firestore import DocumentReference
 import os
@@ -38,10 +39,14 @@ def get_current_user():
 
 def get_user_or_401():
     """Return the current API user or an Unauthorized response."""
-    current_user = get_current_user()
-    if not current_user:
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.split("Bearer ")[-1]
+    
+    try:
+        decoded_token = auth.verify_id_token(token)
+        return decoded_token["uid"]
+    except Exception:
         return jsonify({"error": "Unauthorized"}), 401
-    return current_user
 
 
 def get_profile_doc_ref(username: str):
