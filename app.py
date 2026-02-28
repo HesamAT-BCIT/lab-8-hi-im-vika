@@ -145,6 +145,17 @@ def login():
     return render_template("login.html", error="Invalid credentials. Try again.")
 
 
+@app.route("/api/login", methods=["GET", "POST"])
+def api_login():
+    data = request.json
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={WEB_API_KEY}"
+    payload = {"email": data["email"], "password": data["password"], "returnSecureToken": True}
+    
+    res = requests.post(url, json=payload)
+    if res.status_code == 200:
+        return jsonify({"token": res.json()["idToken"]}), 200
+    return jsonify({"error": "Invalid credentials"}), 401
+
 @app.route("/logout")
 def logout():
     """Clear the session and return to login."""
