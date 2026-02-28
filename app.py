@@ -298,6 +298,13 @@ def api_delete_profile():
     get_profile_doc_ref(username).delete()
     return jsonify({"message": "Profile deleted successfully"}), 200
 
+@app.route("/api/sensor_data", methods=["POST"])
+@require_api_key
+def sensor_data():
+    data = request.json
+    if data is None:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+    return jsonify(data), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
