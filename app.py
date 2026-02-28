@@ -5,12 +5,14 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask.typing import ResponseReturnValue
 import firebase_admin
 import requests
+from dotenv import load_dotenv
 from firebase_admin import credentials, firestore, auth
 from firebase_admin.firestore import DocumentReference
 import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
+load_dotenv()
 WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY")
 
 # A dummy user for the login. 
