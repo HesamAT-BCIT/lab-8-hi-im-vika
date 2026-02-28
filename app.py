@@ -6,6 +6,7 @@ from flask.typing import ResponseReturnValue
 import firebase_admin
 import requests
 from dotenv import load_dotenv
+from functools import wraps
 from firebase_admin import credentials, firestore, auth
 from firebase_admin.firestore import DocumentReference
 import os
@@ -94,6 +95,23 @@ def set_profile(username: str, profile_data: dict[str, str], *, merge: bool):
         merge: When True, merges into existing document (partial update).
     """
     get_profile_doc_ref(username).set(profile_data, merge=merge)
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # 1. Grab the expected key from the environment
+        expected_key = os.environ.get("SENSOR_API_KEY")
+
+        # 2. Grab the provided key from the request headers
+        provided_key = request.headers.get("X-API-Key")
+
+        # 3. Compare them
+        if not provided_key or provided_key != expected_key:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        # 4. If they match, allow the route to execute normally
+        return f(*args, **kwargs)
+    return decorated_function
 
 # --- Web Routes ---
 
