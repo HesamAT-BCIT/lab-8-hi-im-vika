@@ -111,6 +111,8 @@ def signup():
         return render_template("signup.html", error="Passwords do not match")
 
     # TODO: Create user with Firebase Admin SDK
+    user = auth.create_user(email=email, password=password)
+
     # TODO: Initialize profile in Firestore
     # TODO: Redirect to login on success
 
