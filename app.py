@@ -120,6 +120,7 @@ def signup():
     })
 
     # TODO: Redirect to login on success
+    return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
