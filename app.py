@@ -264,18 +264,45 @@ def api_update_profile():
     if not data:
         return jsonify({"error": "Request body cannot be empty"}), 400
 
+    # 1. Whitelist — reject any fields not in the allowed set
+    ALLOWED_FIELDS = {"first_name", "last_name", "student_id"}
+    unknown_fields = set(data.keys()) - ALLOWED_FIELDS
+    if unknown_fields:
+        return jsonify({"error": f"Unknown fields: {', '.join(unknown_fields)}"}), 400
+
     first_name = data.get("first_name")
-    last_name = data.get("last_name")
+    last_name  = data.get("last_name")
     student_id = data.get("student_id")
+
+    # 2 & 3. Bounds checking — collect all errors before returning
+    errors = []
+
+    if first_name is not None:
+        first_name = first_name.strip()
+        if len(first_name) > 50:
+            errors.append("first_name must not exceed 50 characters.")
+
+    if last_name is not None:
+        last_name = last_name.strip()
+        if len(last_name) > 50:
+            errors.append("last_name must not exceed 50 characters.")
+
+    if student_id is not None:
+        student_id = str(student_id).strip()
+        if not (len(student_id) in (8, 9) and student_id.isalnum()):
+            errors.append("student_id must be exactly 8 or 9 alphanumeric characters.")
+
+    if errors:
+        return jsonify({"errors": errors}), 400
 
     # Prepare the update data (only include provided fields)
     update_data = {}
     if first_name is not None:
-        update_data["first_name"] = first_name.strip() if first_name else ""
+        update_data["first_name"] = first_name
     if last_name is not None:
-        update_data["last_name"] = last_name.strip() if last_name else ""
+        update_data["last_name"] = last_name
     if student_id is not None:
-        update_data["student_id"] = str(student_id).strip() if student_id else ""
+        update_data["student_id"] = student_id
 
     if not update_data:
         return jsonify({"error": "No updatable fields provided"}), 400
